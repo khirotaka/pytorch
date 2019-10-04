@@ -32,14 +32,15 @@ void fillQConfigMap(
   }
   map[module.module_object()] = qconfig;
 
-  for (script::Slot s : module.get_module_slots()) {
+  for (auto p : module.get_modules()) {
     std::string child_key;
     if (key == "") {
-      child_key = s.name();
+      child_key = p.first;
     } else {
-      child_key = key + "." + s.name();
+      child_key = key + "." + p.first;
     }
-    fillQConfigMap(s.to_module(), qconfig_dict, map, child_key, qconfig);
+    fillQConfigMap(
+        p.second.module_object(), qconfig_dict, map, child_key, qconfig);
   }
 }
 
@@ -762,8 +763,8 @@ graph(%self, %x):
     worklist.pop();
 
     // Queue submodules for processing
-    for (const script::Module& submodule : current.get_modules()) {
-      worklist.push(submodule);
+    for (const auto& p : current.get_modules()) {
+      worklist.push(p.second);
     }
 
     // Process forward method of the current module
@@ -929,8 +930,8 @@ void InsertPrepackUnpack(script::Module& module) {
   for (auto& method : module.get_methods()) {
     auto graph = method.graph();
     InsertPrepackUnpack(graph);
-    for (auto m : module.get_modules()) {
-      InsertPrepackUnpack(m);
+    for (auto p : module.get_modules()) {
+      InsertPrepackUnpack(p.second);
     }
   }
 }
@@ -1012,7 +1013,7 @@ void FoldPrepackedWeightIntoModule(
   for (auto& method : module.get_methods()) {
     FoldPrepackedWeightIntoModule(module, method.name(), wrapper_module);
     for (auto m : module.get_modules()) {
-      FoldPrepackedWeightIntoModule(m, wrapper_module);
+      FoldPrepackedWeightIntoModule(m.second, wrapper_module);
     }
   }
 }
