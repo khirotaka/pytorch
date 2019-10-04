@@ -10,7 +10,7 @@ option_parser = OptionParser.new do |opts|
  opts.on('-x', '--xcodeproj ', 'path to the XCode project file') { |value|
     options[:xcodeproj] = value
  }
- opts.on('-p', '--platform ', 'iOS platform for the current build') { |value|
+ opts.on('-p', '--platform ', 'choose platform for the current build') { |value|
     options[:platform] = value
  }
 end.parse!
@@ -63,4 +63,4 @@ else
 end 
 
 # run xcodebuild
-exec "xcodebuild clean build  -project #{xcodeproj_path}  -target #{target.name} -sdk #{sdk} -configuration Release"
+exec "xcodebuild clean build  -project #{xcodeproj_path}  -target #{target.name} -sdk #{sdk} -configuration Release -allowProvisioningUpdates"
